@@ -9,7 +9,7 @@ use Mrkatz\LoginProviders\Preset\LoginProviderPreset;
 
 class LoginProvidersServiceProvider extends ServiceProvider
 {
-    const CONFIG_PATH = __DIR__ . '/../config/login-providers.php';
+    const CONFIG_PATH = __DIR__ . '/../config/loginproviders.php';
     const MIGRATIONS_PATH = __DIR__ . '/Database/Migrations';
 
     /**

@@ -3,6 +3,8 @@
 namespace Mrkatz\LoginProviders\Commands;
 
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -23,19 +25,10 @@ class UserMakeCommand extends GeneratorCommand
     protected $description = 'Extend a User Modal to create a new User Type';
 
     /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
-    /**
      * Execute the console command.
      *
-     * @return mixed
+     * @return void
+     * @throws FileNotFoundException
      */
     public function handle()
     {
@@ -58,6 +51,7 @@ class UserMakeCommand extends GeneratorCommand
      * Create a model factory for the model.
      *
      * @return void
+     * @throws FileNotFoundException
      */
     protected function createFactory()
     {
@@ -80,7 +74,7 @@ class UserMakeCommand extends GeneratorCommand
      *
      * @param  string $stub
      * @param  string $name
-     * @return \Mrkatz\LoginProviders\Commands\UserMakeCommand
+     * @return UserMakeCommand
      */
     protected function replaceNamespace(&$stub, $name)
     {
@@ -109,6 +103,7 @@ class UserMakeCommand extends GeneratorCommand
      * Get the stub file for the factory generator.
      *
      * @return string
+     * @throws FileNotFoundException
      */
     protected function getFactoryStub()
     {
