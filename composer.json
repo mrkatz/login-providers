@@ -12,7 +12,7 @@
     "keywords": ["Laravel", "Demo"],
     "minimum-stability": "dev",
 	"require": {
-
+        "laravel/socialite": "^4.2"
     },
 	"require-dev": {
 
