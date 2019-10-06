@@ -62,7 +62,7 @@ class LoginProvidersServiceProvider extends ServiceProvider
      */
     protected function registerConfig()
     {
-        $this->mergeConfigFrom(self::CONFIG_PATH, 'mrkatz.login-providers');
+//        $this->mergeConfigFrom(self::CONFIG_PATH, 'mrkatz.login-providers');
 
         $this->publishes([
             __DIR__ . '/../config' => config_path('mrkatz'),
