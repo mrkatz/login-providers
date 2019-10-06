@@ -24,6 +24,14 @@ class UserMakeCommand extends GeneratorCommand
      */
     protected $description = 'Extend a User Modal to create a new User Type';
 
+
+    /**
+     * The type of class being generated.
+     *
+     * @var string
+     */
+    protected $type = 'Model';
+
     /**
      * Execute the console command.
      *
@@ -136,19 +144,6 @@ class UserMakeCommand extends GeneratorCommand
             ['factory', 'f', InputOption::VALUE_NONE, 'Create a new factory for the model'],
 
             ['force', null, InputOption::VALUE_NONE, 'Create the class even if the model already exists.'],
-        ];
-    }
-
-    /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
-    protected function getArguments()
-    {
-        return [
-            ['name', InputArgument::REQUIRED, 'The name of the class'],
-            ['query', InputArgument::IS_ARRAY | InputArgument::REQUIRED, 'The Query Columns & Value Of User - Eg \'is_admin\' true'],
         ];
     }
 }
