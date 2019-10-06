@@ -36,7 +36,7 @@ class LoginProvidersServiceProvider extends ServiceProvider
         $this
             ->registerRoutes()
             ->registerMigrations()
-            ->registerConfig()
+//            ->registerConfig()
             ->registerPreset()
             ->registerViews();
     }
