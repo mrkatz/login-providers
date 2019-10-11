@@ -9,7 +9,7 @@
         }
     ],
 	"homepage": "https://github.com/mrkatz/login-providers",
-    "keywords": ["Laravel", "Demo"],
+    "keywords": ["Laravel", "Login", "Providers", "Social"],
     "minimum-stability": "dev",
 	"require": {
         "laravel/socialite": "^4.2"

@@ -4,9 +4,7 @@ namespace Mrkatz\LoginProviders\Commands;
 
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
-use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 
 class UserMakeCommand extends GeneratorCommand
 {
@@ -33,55 +31,10 @@ class UserMakeCommand extends GeneratorCommand
     protected $type = 'Model';
 
     /**
-     * Execute the console command.
-     *
-     * @return void
-     * @throws FileNotFoundException
-     */
-    public function handle()
-    {
-        if (count($this->argument('query')) !== 2) {
-            $this->error('invalid query properties - Require 2 values, ColumnName ColumnValue');
-
-            return;
-        }
-
-        if (parent::handle() === false && !$this->option('force')) {
-            return;
-        }
-
-        if ($this->option('factory')) {
-            $this->createFactory();
-        }
-    }
-
-    /**
-     * Create a model factory for the model.
-     *
-     * @return void
-     * @throws FileNotFoundException
-     */
-    protected function createFactory()
-    {
-        $name = $this->qualifyClass($this->getNameInput());
-
-        $fileName = str_replace(
-            ['\\', '/'], '', $this->argument('name')
-        );
-        $path = $this->laravel->databasePath() . "/factories/{$fileName}Factory.php";
-
-        $stub = $this->getFactoryStub();
-
-        $this->files->put($path, $this->replaceNamespace($stub, $name)->replaceClass($stub, $name));
-
-        $this->info($name . ' factory created successfully.');
-    }
-
-    /**
      * Replace the namespace for the given stub.
      *
-     * @param  string $stub
-     * @param  string $name
+     * @param string $stub
+     * @param string $name
      * @return UserMakeCommand
      */
     protected function replaceNamespace(&$stub, $name)
@@ -124,7 +77,7 @@ class UserMakeCommand extends GeneratorCommand
     /**
      * Get the default namespace for the class.
      *
-     * @param  string $rootNamespace
+     * @param string $rootNamespace
      *
      * @return string
      */
@@ -134,16 +87,14 @@ class UserMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Get the console command options.
+     * Get the console command arguments.
      *
      * @return array
      */
-    protected function getOptions()
+    protected function getArguments()
     {
         return [
-            ['factory', 'f', InputOption::VALUE_NONE, 'Create a new factory for the model'],
-
-            ['force', null, InputOption::VALUE_NONE, 'Create the class even if the model already exists.'],
+            ['name', InputArgument::REQUIRED, 'The name of the user Model'],
         ];
     }
 }

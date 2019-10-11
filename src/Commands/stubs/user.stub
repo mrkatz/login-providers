@@ -14,7 +14,7 @@ class DummyClass extends User
         parent::boot();
 
         static::addGlobalScope(function ($query) {
-            $query->where(DummyColumn, DummyValue);
+            $query->where("DummyColumn", "DummyValue");
         });
     }
 }

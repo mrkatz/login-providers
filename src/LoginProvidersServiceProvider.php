@@ -9,7 +9,7 @@ use Mrkatz\LoginProviders\Preset\LoginProviderPreset;
 
 class LoginProvidersServiceProvider extends ServiceProvider
 {
-    const CONFIG_PATH = __DIR__ . '../config/loginproviders.php';
+    const CONFIG_PATH = __DIR__ . '/../config/loginproviders.php';
     const MIGRATIONS_PATH = __DIR__ . '/Database/Migrations';
 
     /**
@@ -36,7 +36,7 @@ class LoginProvidersServiceProvider extends ServiceProvider
         $this
             ->registerRoutes()
             ->registerMigrations()
-//            ->registerConfig()
+            ->registerConfig()
             ->registerPreset()
             ->registerViews();
     }
@@ -62,7 +62,7 @@ class LoginProvidersServiceProvider extends ServiceProvider
      */
     protected function registerConfig()
     {
-//        $this->mergeConfigFrom(self::CONFIG_PATH, 'mrkatz.login-providers');
+        $this->mergeConfigFrom(self::CONFIG_PATH, 'mrkatz.login-providers');
 
         $this->publishes([
             __DIR__ . '/../config' => config_path('mrkatz'),
