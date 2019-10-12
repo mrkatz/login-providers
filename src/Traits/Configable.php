@@ -12,10 +12,13 @@ trait Configable
     /**
      * @param string $property
      * @param string $append
-     * @return Repository|mixed
+     * @return mixed|Repository|string
      */
     protected function getConfigValue($property, $append = '')
     {
+        if ($append == '') {
+            return config($this->getConfigNameSpace() . $this->getConfigName() . '.' . $property);
+        }
         return config($this->getConfigNameSpace() . $this->getConfigName() . '.' . $property) . $append;
     }
 
