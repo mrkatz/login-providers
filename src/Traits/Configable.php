@@ -7,7 +7,7 @@ use Illuminate\Config\Repository;
 
 trait Configable
 {
-    protected $CONFIG_PATH = __DIR__ . '/../config/loginproviders.php';
+    protected $CONFIG_PATH = __DIR__ . '/../../config/loginproviders.php';
 
     /**
      * @param string $property
