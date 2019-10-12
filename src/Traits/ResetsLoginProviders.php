@@ -3,8 +3,10 @@
 namespace Mrkatz\LoginProviders\Traits;
 
 use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Foundation\Auth\ResetsPasswords;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Hash;
 
 trait ResetsLoginProviders
 {
@@ -12,13 +14,13 @@ trait ResetsLoginProviders
     /**
      * Reset the given user's password.
      *
-     * @param  \Illuminate\Contracts\Auth\CanResetPassword $user
+     * @param  CanResetPassword $user
      * @param  string                                      $password
      * @return void
      */
     protected function resetPassword($user, $password)
     {
-        $user->password(bcrypt($password));
+        $user->password(Hash::make($password));
 
         $user->setRememberToken(Str::random(60));
 

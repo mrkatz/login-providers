@@ -3,8 +3,10 @@
 namespace Mrkatz\LoginProviders\Traits;
 
 use App\User;
-use Auth;
-use Illuminate\Support\Arr;
+use Exception;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Redirect;
 use Laravel\Socialite\AbstractUser;
 use Laravel\Socialite\Facades\Socialite;
@@ -12,20 +14,23 @@ use Mrkatz\LoginProviders\Model\LoginProvider;
 
 trait UsesLoginProviders
 {
+    use Configable;
+
     protected $socialRoutes = ['redirectToProvider', 'handleProviderCallback'];
 
     /**
      * Create a new user instance after a valid registration.
      *
-     * @param  array $data
-     * @return \App\User
+     * @param array $data
+     * @return User
      */
     protected function create(array $data)
     {
-        if (!config('mrkatz.login-providers.providers.email')) {
+
+        if (!$this->getConfigValue('providers.email')) {
             return User::create([
-                'name'     => $data['name'],
-                'email'    => $data['email'],
+                'name' => $data['name'],
+                'email' => $data['email'],
                 'password' => bcrypt($data['password']),
             ]);
         }
@@ -34,10 +39,10 @@ trait UsesLoginProviders
 
         LoginProvider::create([
             'provider_type' => 'email',
-            'provider_id'   => bcrypt($data['password']),
-            'name'          => $data['name'],
-            'email'         => $data['email'],
-            'user_id'       => $user->id,
+            'provider_id' => Hash::make($data['password']),
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'user_id' => $user->id,
         ]);
 
         return $user;
@@ -47,13 +52,13 @@ trait UsesLoginProviders
     {
         if ($data instanceof AbstractUser) {
             return User::create([
-                'name'  => $data->getName(),
+                'name' => $data->getName(),
                 'email' => $data->getEmail() == '' ? '' : $data->getEmail(),
             ]);
         };
 
         return User::create([
-            'name'  => $data['name'],
+            'name' => $data['name'],
             'email' => $data['email'],
         ]);
 
@@ -67,7 +72,7 @@ trait UsesLoginProviders
      */
     public function redirectToProvider($provider)
     {
-        if (!in_array($provider, config('mrkatz.login-providers.providers.social'))) {
+        if (!in_array($provider, $this->getConfigValue('providers.social'))) {
             return redirect('login');
         }
 
@@ -78,13 +83,13 @@ trait UsesLoginProviders
      * Obtain the user information from social network.
      *
      * @param $provider
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
     public function handleProviderCallback($provider)
     {
         try {
             $socialUser = Socialite::driver($provider)->user();
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return Redirect::to('login');
         }
 
@@ -107,15 +112,15 @@ trait UsesLoginProviders
             };
 
             $socialLogin = LoginProvider::create([
-                'provider_id'   => $socialUser->getId(),
+                'provider_id' => $socialUser->getId(),
                 'provider_type' => $provider,
-                'verified'      => $verified,
-                'nickname'      => $socialUser->nickname,
-                'name'          => $socialUser->getName(),
-                'email'         => $socialUser->getEmail() == '' ? '' : $socialUser->getEmail(),
-                'avatar'        => $socialUser->avatar,
-                'meta'          => json_encode($socialUser),
-                'user_id'       => $user->id,
+                'verified' => $verified,
+                'nickname' => $socialUser->nickname,
+                'name' => $socialUser->getName(),
+                'email' => $socialUser->getEmail() == '' ? '' : $socialUser->getEmail(),
+                'avatar' => $socialUser->avatar,
+                'meta' => json_encode($socialUser),
+                'user_id' => $user->id,
             ]);
 
         } else {

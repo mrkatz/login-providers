@@ -6,10 +6,12 @@ use Illuminate\Foundation\Console\PresetCommand;
 use Illuminate\Support\ServiceProvider;
 use Mrkatz\LoginProviders\Commands\UserMakeCommand;
 use Mrkatz\LoginProviders\Preset\LoginProviderPreset;
+use Mrkatz\LoginProviders\Traits\Configable;
 
 class LoginProvidersServiceProvider extends ServiceProvider
 {
-    const CONFIG_PATH = __DIR__ . '/../config/loginproviders.php';
+    use Configable;
+
     const MIGRATIONS_PATH = __DIR__ . '/Database/Migrations';
 
     /**
@@ -62,10 +64,10 @@ class LoginProvidersServiceProvider extends ServiceProvider
      */
     protected function registerConfig()
     {
-        $this->mergeConfigFrom(self::CONFIG_PATH, 'mrkatz.login-providers');
+        $this->mergeConfigFrom($this->CONFIG_PATH,$this->getConfigName());
 
         $this->publishes([
-            __DIR__ . '/../config' => config_path('mrkatz'),
+            __DIR__ . '/../config' => config_path($this->getConfigName()),
         ], 'config');
 
         return $this;
