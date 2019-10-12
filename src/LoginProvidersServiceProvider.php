@@ -67,7 +67,7 @@ class LoginProvidersServiceProvider extends ServiceProvider
         $this->mergeConfigFrom($this->CONFIG_PATH,$this->getConfigName());
 
         $this->publishes([
-            __DIR__ . '/../config' => config_path($this->getConfigName()),
+            __DIR__ . '/../config' => config_path($this->getConfigNameSpace()),
         ], 'config');
 
         return $this;

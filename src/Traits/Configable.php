@@ -7,7 +7,7 @@ use Illuminate\Config\Repository;
 
 trait Configable
 {
-    protected $CONFIG_PATH = __DIR__ . '/../../config/loginproviders.php';
+    protected $CONFIG_PATH = __DIR__ . '/../../config/login-providers.php';
 
     /**
      * @param string $property
@@ -16,7 +16,7 @@ trait Configable
      */
     protected function getConfigValue($property, $append = '')
     {
-        return config($this->getConfigName() . '.' . $property) . $append;
+        return config($this->getConfigNameSpace() . $this->getConfigName() . '.' . $property) . $append;
     }
 
     /**
@@ -24,6 +24,14 @@ trait Configable
      */
     protected function getConfigName()
     {
-        return 'mrkatz.login-providers';
+        return 'login-providers';
+    }
+
+    /**
+     * @return string
+     */
+    protected function getConfigNameSpace()
+    {
+        return '';
     }
 }
