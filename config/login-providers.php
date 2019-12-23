@@ -13,5 +13,6 @@ return [
         ],
 
     ],
+    'verify' => false
 
 ];
