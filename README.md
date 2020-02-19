@@ -16,17 +16,6 @@ $ composer require mrkatz/login-providers
 
 ## Usage
 
-### Register Service Provider
-
-**Note! This and next step are optional if you use laravel>=5.5 with package
-auto discovery feature.**
-
-Add service provider to `config/app.php` in `providers` section
-Not needed in Laravel 5.5
-```php
-Mrkatz\LoginProviders\ServiceProvider::class,
-```
-
 ### Add Traits
 
 Add Trait `HasLoginProviders` to `User` modal
