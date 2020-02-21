@@ -1,38 +1,44 @@
 {
-    "name": "mrkatz/login-providers",
-    "description": "A Login Provider Package",
-    "license": "MIT",
-    "authors": [
-        {
-            "name": "Adam Kaczocha",
-            "email": "adamkaczocha@gmail.com"
-        }
-    ],
-	"homepage": "https://github.com/mrkatz/login-providers",
-    "keywords": ["Laravel", "Login", "Providers", "Social"],
-    "minimum-stability": "dev",
-	"require": {
-        "laravel/socialite": "^4.2"
-    },
-	"require-dev": {
-        "orchestra/testbench": "^4.0",
-        "phpunit/phpunit": "^8.0"
-    },
-    "autoload": {
-        "psr-4": {
-            "Mrkatz\\LoginProviders\\": "src/"
-        }
-    },
-	    "autoload-dev": {
-        "psr-4": {
-            "Mrkatz\\LoginProviders\\Tests\\": "tests"
-        }
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "Mrkatz\\LoginProviders\\LoginProvidersServiceProvider"
-            ]
-        }
+  "name": "mrkatz/login-providers",
+  "description": "A Login Provider Package",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Adam Kaczocha",
+      "email": "adamkaczocha@gmail.com"
     }
+  ],
+  "homepage": "https://github.com/mrkatz/login-providers",
+  "keywords": [
+    "Laravel",
+    "Login",
+    "Providers",
+    "Social"
+  ],
+  "minimum-stability": "dev",
+  "require": {
+    "laravel/socialite": "^4.2",
+    "doctrine/dbal": "^2.10"
+  },
+  "require-dev": {
+    "orchestra/testbench": "^4.0",
+    "phpunit/phpunit": "^8.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Mrkatz\\LoginProviders\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Mrkatz\\LoginProviders\\Tests\\": "tests"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "Mrkatz\\LoginProviders\\LoginProvidersServiceProvider"
+      ]
+    }
+  }
 }

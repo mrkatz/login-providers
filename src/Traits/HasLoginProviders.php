@@ -16,16 +16,6 @@ trait HasLoginProviders
         return $this->password();
     }
 
-    public function loginProviders($provider = null)
-    {
-        $logins = $this->hasMany(LoginProvider::class)->get();
-        if ($provider === null) {
-            return $logins;
-        }
-
-        return $logins->where('provider_type', '=', $provider)->first();
-    }
-
     public function password($value = null)
     {
         if (property_exists(self::class, 'password')) {
@@ -39,7 +29,7 @@ trait HasLoginProviders
         $emailProvider = $this->loginProviders('email');
 
         if ($emailProvider !== null) {
-            if ($value !== null){
+            if ($value !== null) {
                 $emailProvider->provider_id = $value;
                 $emailProvider->save();
             }
@@ -47,6 +37,17 @@ trait HasLoginProviders
         }
 
         return null;
+    }
+
+    public function loginProviders($provider = null)
+    {
+        $logins = $this->hasMany(LoginProvider::class)->get();
+
+        if ($provider === null) {
+            return $logins;
+        }
+
+        return $logins->where('provider_type', '=', $provider)->first();
     }
 
 }

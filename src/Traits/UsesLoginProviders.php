@@ -5,73 +5,24 @@ namespace Mrkatz\LoginProviders\Traits;
 use App\User;
 use Exception;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Redirect;
-use Laravel\Socialite\AbstractUser;
-use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Routing\Redirector;
+use Auth;
+use Redirect;
+use Socialite;
 use Mrkatz\LoginProviders\Model\LoginProvider;
-use function Couchbase\defaultDecoder;
+use Str;
+use Throwable;
 
 trait UsesLoginProviders
 {
     use Configable;
-
-    protected $socialRoutes = ['redirectToProvider', 'handleProviderCallback'];
-
-    /**
-     * Create a new user instance after a valid registration.
-     *
-     * @param array $data
-     *
-     * @return User
-     */
-    protected function create(array $data)
-    {
-
-        if (!$this->getConfigValue('providers.email')) {
-            return User::create([
-                                    'name'     => $data['name'],
-                                    'email'    => $data['email'],
-                                    'password' => bcrypt($data['password']),
-                                ]);
-        }
-
-        $user = $this->createUser($data);
-
-        LoginProvider::create([
-                                  'provider_type' => 'email',
-                                  'provider_id'   => Hash::make($data['password']),
-                                  'name'          => $data['name'],
-                                  'email'         => $data['email'],
-                                  'user_id'       => $user->id,
-                              ]);
-
-        return $user;
-    }
-
-    protected function createUser($data)
-    {
-        if ($data instanceof AbstractUser) {
-            return User::create([
-                                    'name'  => $data->getName(),
-                                    'email' => $data->getEmail() == '' ? '' : $data->getEmail(),
-                                ]);
-        };
-
-        return User::create([
-                                'name'  => $data['name'],
-                                'email' => $data['email'],
-                            ]);
-
-    }
 
     /**
      * Redirect to social provider.
      *
      * @param $provider
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
+     * @return RedirectResponse|Redirector
      */
     public function redirectToProvider($provider)
     {
@@ -88,56 +39,76 @@ trait UsesLoginProviders
      * @param $provider
      *
      * @return RedirectResponse
+     * @throws Throwable
      */
     public function handleProviderCallback($provider)
     {
         try {
-            $socialUser = Socialite::driver($provider)->user();
-        } catch (Exception $e) {
-            return Redirect::to('login');
+            $providerUser = Socialite::driver($provider)->user();
+        } catch (Throwable |Exception $e) {
+            if (config('app.debug')) {
+                throw $e;
+            }
+            return $this->redirectOnFail();
         }
 
-        $socialLogin = LoginProvider::where('provider_id', '=', $socialUser->id)
+        $user = $this->findOrCreateLoginProvider($providerUser, $provider);
+
+        Auth::login($user);
+
+        return $this->redirectOnSuccess();
+    }
+
+    public function redirectOnFail()
+    {
+        return Redirect::to('login');
+    }
+
+    protected function findOrCreateLoginProvider($providerUser, $provider)
+    {
+        $socialLogin = LoginProvider::where('provider_id', '=', $providerUser->id)
                                     ->where('provider_type', '=', $provider)
                                     ->first();
 
         if ($socialLogin == null) {
             $verified = true;
 
-            $user = User::where('email', '=', $socialUser->getEmail())->first();
+            $user = User::where('email', '=', $providerUser->getEmail())->first();
 
             if ($user === null) {
-                $user = $this->createUser($socialUser);
+                $user = $this->create([
+                                          'name'     => $providerUser->getName(),
+                                          'email'    => $providerUser->getEmail() == '' ? Str::random(30) . "@noemail.com" : $providerUser->getEmail(),
+                                          'password' => Str::random(),
+                                          'nickname' => $providerUser->nickname,
+                                          'avatar'   => $providerUser->avatar,
+                                          'provider' => $providerUser,
+                                      ]);
             } else {
 
                 if (!auth()->check() || auth()->user()->id !== $user->id) {
                     $verified = false;
                 }
-            };
+            }
 
             $socialLogin = LoginProvider::create([
-                                                     'provider_id'   => $socialUser->getId(),
+                                                     'provider_id'   => $providerUser->getId(),
                                                      'provider_type' => $provider,
                                                      'verified'      => $verified,
-                                                     'nickname'      => $socialUser->nickname,
-                                                     'name'          => $socialUser->getName(),
-                                                     'email'         => $socialUser->getEmail() == '' ? '' : $socialUser->getEmail(),
-                                                     'avatar'        => $socialUser->avatar,
-                                                     'meta'          => json_encode($socialUser),
+                                                     'nickname'      => $providerUser->nickname,
+                                                     'name'          => $providerUser->getName(),
+                                                     'email'         => $providerUser->getEmail() == '' ? '' : $providerUser->getEmail(),
+                                                     'avatar'        => $providerUser->avatar,
+                                                     'meta'          => json_encode($providerUser),
                                                      'user_id'       => $user->id,
                                                  ]);
 
-        } else {
-            $user = $socialLogin->user;
         }
+        return $socialLogin->user;
+    }
 
-        if ($this->getConfigValue('verify') && !$socialLogin->verified) {
-            dd('verification not set - error');
-            //            flash('Please check your email to confirm account')->important();
-            return redirect('/');
-        }
-        Auth::login($user);
-
+    public function redirectOnSuccess()
+    {
 //        flash('Welcome!!! You are now logged in...')->success();
 
         return redirect()->intended($this->redirectPath());

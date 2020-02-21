@@ -15,7 +15,7 @@ class CreateLoginProvidersTable extends Migration
     {
         Schema::create('login_providers', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('user_id');
+            $table->bigInteger('user_id');
 
             $table->string('provider_id');
             $table->string('provider_type');
@@ -31,7 +31,7 @@ class CreateLoginProvidersTable extends Migration
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->unique([ 'user_id','provider_type' ]);
+            $table->unique(['user_id', 'provider_type']);
         });
     }
 

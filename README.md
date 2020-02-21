@@ -20,23 +20,34 @@ $ composer require mrkatz/login-providers
 
 Add Trait `HasLoginProviders` to `User` modal
 ```php
+use Mrkatz\LoginProviders\Traits\HasLoginProviders;
+
+class User extends Authenticatable
+{
 use Notifiable, HasLoginProviders;
+}
 ```
 
 Add Trait `UsesLoginProviders` in `Auth/RegisterController` Controller
 ```php
-use UsesLoginProviders;
+use Mrkatz\LoginProviders\Traits\UsesLoginProviders;
+
+class RegisterController extends Controller
+{
+use RegistersUsers, UsesLoginProviders;
+}
 ```
 
 Replace Trait `ResetsPasswords` to `ResetsLoginProviders` in `Auth/ResetPasswordController` Controller
 ```php
+//may not need???
 use ResetsLoginProviders;
 ```
 
 ### Edit RegisterController
 
 Rename create function to createUser and make sure to pass $data['name'], if changed
-
+why???
 ```
     protected function createUser(&$data)
     {
@@ -62,6 +73,16 @@ php artisan vendor:publish --provider="Mrkatz\LoginProviders\ServiceProvider" --
 ```
 Route::get('login/{provider}', 'Auth\RegisterController@redirectToProvider');
 Route::get('login/{provider}/callback', 'Auth\RegisterController@handleProviderCallback');
+```
+
+###Set client id and client secret config/service.php file :
+
+```php
+'facebook' => [
+    'client_id' => env('FACEBOOK_CLIENT_ID'),
+    'client_secret' => env('FACEBOOK_CLIENT_SECRET'),
+    'redirect' => 'http://your-callback-url/login/{provider}/callback',
+],
 ```
 
 ## Usage

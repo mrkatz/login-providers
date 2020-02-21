@@ -14,9 +14,11 @@ class AdaptUsersTableToLoginProviders extends Migration
     public function up()
     {
         if (config('login-providers.providers.email')) {
-            Schema::table('users', function (Blueprint $table) {
-                $table->dropColumn('password');
-            });
+            if (Schema::hasColumn('users', 'password')) {
+                Schema::table('users', function (Blueprint $table) {
+                    $table->dropColumn('password');
+                });
+            }
         }
     }
 
