@@ -10,9 +10,9 @@ use Mrkatz\LoginProviders\Traits\Configable;
 
 class LoginProvidersServiceProvider extends ServiceProvider
 {
-    use Configable;
-
-    const MIGRATIONS_PATH = __DIR__ . '/Database/Migrations';
+//    use Configable;
+    protected $MIGRATIONS_PATH = __DIR__ . '/Database/Migrations';
+    protected $CONFIG_PATH = __DIR__ . '/../config/login-providers.php';
 
     /**
      * Bootstrap services.
@@ -22,9 +22,9 @@ class LoginProvidersServiceProvider extends ServiceProvider
     public function boot()
     {
         if ($this->app->runningInConsole()) {
-            $this->commands([
-                UserMakeCommand::class,
-            ]);
+//            $this->commands([
+//                UserMakeCommand::class,
+//            ]);
         }
     }
 
@@ -44,36 +44,6 @@ class LoginProvidersServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register Preset Command Micro
-     * @return $this
-     */
-    protected function registerPreset()
-    {
-        PresetCommand::macro('login-providers', function ($command) {
-            LoginProviderPreset::install(true);
-            $command->info('Login Providers scaffolding installed successfully.');
-        });
-
-        return $this;
-    }
-
-    /**
-     * Register & Publish Config Files
-     *
-     * @return $this
-     */
-    protected function registerConfig()
-    {
-        $this->mergeConfigFrom($this->CONFIG_PATH,$this->getConfigName());
-
-        $this->publishes([
-            __DIR__ . '/../config' => config_path($this->getConfigNameSpace()),
-        ], 'config');
-
-        return $this;
-    }
-
-    /**
      * Register & Publish Views
      *
      * @return $this
@@ -90,13 +60,32 @@ class LoginProvidersServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register Routes
+     * Register Preset Command Micro
      *
      * @return $this
      */
-    protected function registerRoutes()
+    protected function registerPreset()
     {
-//        $this->loadRoutesFrom(realpath(__DIR__ . '/Routes/routes.php'));
+//        PresetCommand::macro('login-providers', function ($command) {
+//            LoginProviderPreset::install(true);
+//            $command->info('Login Providers scaffolding installed successfully.');
+//        });
+
+        return $this;
+    }
+
+    /**
+     * Register & Publish Config Files
+     *
+     * @return $this
+     */
+    protected function registerConfig()
+    {
+        $this->mergeConfigFrom($this->CONFIG_PATH, 'login-providers');
+
+        $this->publishes([
+                             __DIR__ . '/../config' => config_path(),
+                         ], 'config');
 
         return $this;
     }
@@ -109,10 +98,22 @@ class LoginProvidersServiceProvider extends ServiceProvider
     protected function registerMigrations()
     {
         $this->publishes([
-            self::MIGRATIONS_PATH => database_path('migrations/'),
-        ], 'migrations');
+                             $this->MIGRATIONS_PATH => database_path('migrations/'),
+                         ], 'migrations');
 
-        $this->loadMigrationsFrom(self::MIGRATIONS_PATH);
+        $this->loadMigrationsFrom($this->MIGRATIONS_PATH);
+
+        return $this;
+    }
+
+    /**
+     * Register Routes
+     *
+     * @return $this
+     */
+    protected function registerRoutes()
+    {
+//        $this->loadRoutesFrom(realpath(__DIR__ . '/Routes/routes.php'));
 
         return $this;
     }

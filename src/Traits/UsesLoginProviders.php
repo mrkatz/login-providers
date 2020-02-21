@@ -7,6 +7,7 @@ use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Routing\Redirector;
 use Auth;
+use Laravel\Socialite\Contracts\User as ProviderUser;
 use Redirect;
 use Socialite;
 use Mrkatz\LoginProviders\Model\LoginProvider;
@@ -15,8 +16,6 @@ use Throwable;
 
 trait UsesLoginProviders
 {
-    use Configable;
-
     /**
      * Redirect to social provider.
      *
@@ -26,11 +25,21 @@ trait UsesLoginProviders
      */
     public function redirectToProvider($provider)
     {
-        if (!in_array($provider, $this->getConfigValue('providers.social'))) {
-            return redirect('login');
+        if (!in_array($provider, config('login-providers.providers.social'))) {
+            return $this->redirectOnFail();
         }
 
         return Socialite::with($provider)->redirect();
+    }
+
+    /**
+     * Redirect User on Failed Registration/Login
+     *
+     * @return RedirectResponse
+     */
+    public function redirectOnFail()
+    {
+        return Redirect::to('login');
     }
 
     /**
@@ -59,11 +68,14 @@ trait UsesLoginProviders
         return $this->redirectOnSuccess();
     }
 
-    public function redirectOnFail()
-    {
-        return Redirect::to('login');
-    }
-
+    /**
+     * Find or Create New User & LoginProvider
+     *
+     * @param ProviderUser $providerUser
+     * @param $provider
+     *
+     * @return User
+     */
     protected function findOrCreateLoginProvider($providerUser, $provider)
     {
         $socialLogin = LoginProvider::where('provider_id', '=', $providerUser->id)
@@ -73,12 +85,14 @@ trait UsesLoginProviders
         if ($socialLogin == null) {
             $verified = true;
 
-            $user = User::where('email', '=', $providerUser->getEmail())->first();
+            $email = $providerUser->getEmail() ?: $provider . '.' . $providerUser->getId() . '@noemail.com';
+
+            $user = User::where('email', '=', $email);
 
             if ($user === null) {
                 $user = $this->create([
                                           'name'     => $providerUser->getName(),
-                                          'email'    => $providerUser->getEmail() == '' ? Str::random(30) . "@noemail.com" : $providerUser->getEmail(),
+                                          'email'    => $email,
                                           'password' => Str::random(),
                                           'nickname' => $providerUser->nickname,
                                           'avatar'   => $providerUser->avatar,
@@ -97,16 +111,22 @@ trait UsesLoginProviders
                                                      'verified'      => $verified,
                                                      'nickname'      => $providerUser->nickname,
                                                      'name'          => $providerUser->getName(),
-                                                     'email'         => $providerUser->getEmail() == '' ? '' : $providerUser->getEmail(),
+                                                     'email'         => $email,
                                                      'avatar'        => $providerUser->avatar,
                                                      'meta'          => json_encode($providerUser),
                                                      'user_id'       => $user->id,
                                                  ]);
 
         }
+
         return $socialLogin->user;
     }
 
+    /**
+     * Redirect on successful Registration/Login
+     *
+     * @return RedirectResponse
+     */
     public function redirectOnSuccess()
     {
 //        flash('Welcome!!! You are now logged in...')->success();

@@ -38,30 +38,6 @@ use RegistersUsers, UsesLoginProviders;
 }
 ```
 
-Replace Trait `ResetsPasswords` to `ResetsLoginProviders` in `Auth/ResetPasswordController` Controller
-```php
-//may not need???
-use ResetsLoginProviders;
-```
-
-### Edit RegisterController
-
-Rename create function to createUser and make sure to pass $data['name'], if changed
-why???
-```
-    protected function createUser(&$data)
-    {
-        $data['name'] = $data['first_name'] . ' ' . $data['last_name'];
-
-        return User::create([
-            'first_name' => $data['first_name'],
-            'last_name'  => $data['last_name'],
-            'email'      => $data['email'],
-            'password'   => Hash::make($data['password']),
-        ]);
-    }
-```
-
 ### Publish Configuration File
 
 ```
