@@ -50,11 +50,12 @@ class LoginProvidersServiceProvider extends ServiceProvider
      */
     protected function registerViews()
     {
-//        $this->loadViewsFrom(realpath(__DIR__ . '/Views'), 'media-manager');
-//
-//        $this->publishes([
-//            __DIR__ . '/Views' => resource_path('views/vendor/mrkatz/media-manager'),
-//        ], 'views');
+
+        $this->loadViewsFrom(realpath(__DIR__ . '/Views'), 'login-providers');
+
+        $this->publishes([
+            __DIR__ . '/Views' => resource_path('views/vendor/login-providers'),
+        ], 'views');
 
         return $this;
     }
@@ -84,7 +85,7 @@ class LoginProvidersServiceProvider extends ServiceProvider
         $this->mergeConfigFrom($this->CONFIG_PATH, 'login-providers');
 
         $this->publishes([
-                             __DIR__ . '/../config' => config_path(),
+                             __DIR__ . '/../config/login-providers.php' => config_path('login-providers.php'),
                          ], 'config');
 
         return $this;

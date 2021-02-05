@@ -1,14 +1,12 @@
 language: php
 
-
 env:
   global:
     - COVERAGE=0
+sudo: false
 
 matrix:
   include:
-    - php: 7.2
-      env: LARAVEL='5.6.*' 'TESTBENCH='3.6.*'
     - php: 7.2
       env: LARAVEL='5.7.*' 'TESTBENCH='3.7.*'
     - php: 7.2
@@ -17,7 +15,13 @@ matrix:
       env: LARAVEL='6.*' 'TESTBENCH='4.*'
     - php: 7.3
       env: LARAVEL='6.*' 'TESTBENCH='4.*'
+    - php: 7.3
+      env: LARAVEL='7.*' 'TESTBENCH='5.*'
+    - php: 7.3
+      env: LARAVEL='8.*' 'TESTBENCH='6.*'
+
   fast_finish: true
+
 
 before_script:
   - composer config discard-changes true
@@ -27,7 +31,9 @@ before_install:
   - travis_retry composer require "laravel/framework:${LARAVEL}" "orchestra/testbench:${TESTBENCH}" --no-interaction --no-update
 
 install:
-  - travis_retry composer install --prefer-dist --no-interaction --no-suggest
+  - npm config set package-lock false
+  - travis_retry composer install --prefer-dist --no-interaction
+  - travis_retry composer update
 
 script:
   - vendor/bin/phpunit --coverage-text --coverage-clover=coverage.clover

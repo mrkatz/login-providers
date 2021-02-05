@@ -2,7 +2,7 @@
 
 namespace Mrkatz\LoginProviders\Model;
 
-use App\User;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Database\Eloquent\Model;
 
 class LoginProvider extends Model

@@ -2,6 +2,7 @@
 
 namespace Mrkatz\LoginProviders\Traits;
 
+use App\Actions\Fortify\CreateNewUser;
 use App\User;
 use Exception;
 use Illuminate\Http\RedirectResponse;
@@ -54,7 +55,7 @@ trait UsesLoginProviders
     {
         try {
             $providerUser = Socialite::driver($provider)->user();
-        } catch (Throwable |Exception $e) {
+        } catch (Throwable | Exception $e) {
             if (config('app.debug')) {
                 throw $e;
             }
@@ -79,25 +80,27 @@ trait UsesLoginProviders
     protected function findOrCreateLoginProvider($providerUser, $provider)
     {
         $socialLogin = LoginProvider::where('provider_id', '=', $providerUser->id)
-                                    ->where('provider_type', '=', $provider)
-                                    ->first();
+            ->where('provider_type', '=', $provider)
+            ->first();
 
         if ($socialLogin == null) {
             $verified = true;
 
             $email = $providerUser->getEmail() ?: $provider . '.' . $providerUser->getId() . '@noemail.com';
 
-            $user = User::where('email', '=', $email);
+            $user = User::where('email', '=', $email)->first();
 
             if ($user === null) {
+
                 $user = $this->create([
-                                          'name'     => $providerUser->getName(),
-                                          'email'    => $email,
-                                          'password' => Str::random(),
-                                          'nickname' => $providerUser->nickname,
-                                          'avatar'   => $providerUser->avatar,
-                                          'provider' => $providerUser,
-                                      ]);
+                    'name' => $providerUser->getName(),
+                    'email' => $email,
+                    'password' => Str::random(),
+                    'nickname' => $providerUser->nickname,
+                    'avatar' => $providerUser->avatar,
+                    'provider' => $providerUser,
+                    'social' => true,
+                ]);
             } else {
 
                 if (!auth()->check() || auth()->user()->id !== $user->id) {
@@ -106,16 +109,16 @@ trait UsesLoginProviders
             }
 
             $socialLogin = LoginProvider::create([
-                                                     'provider_id'   => $providerUser->getId(),
-                                                     'provider_type' => $provider,
-                                                     'verified'      => $verified,
-                                                     'nickname'      => $providerUser->nickname,
-                                                     'name'          => $providerUser->getName(),
-                                                     'email'         => $email,
-                                                     'avatar'        => $providerUser->avatar,
-                                                     'meta'          => json_encode($providerUser),
-                                                     'user_id'       => $user->id,
-                                                 ]);
+                'provider_id' => $providerUser->getId(),
+                'provider_type' => $provider,
+                'verified' => $verified,
+                'nickname' => $providerUser->nickname,
+                'name' => $providerUser->getName(),
+                'email' => $email,
+                'avatar' => $providerUser->avatar,
+                'meta' => json_encode($providerUser),
+                'user_id' => $user->id,
+            ]);
 
         }
 

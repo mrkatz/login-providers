@@ -33,3 +33,5 @@ Homestead.json
 .phpunit.result.cache
 commit.bat
 
+composer.lock
+
