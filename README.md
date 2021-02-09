@@ -50,8 +50,8 @@ php artisan vendor:publish --provider="Mrkatz\LoginProviders\LoginProvidersServi
 
 Jetstream Routes
 ```
-Route::get('login/{provider}', 'Auth\RegisterController@redirectToProvider');
-Route::get('login/{provider}/callback', 'Auth\RegisterController@handleProviderCallback');
+Route::get('login/{provider}', 'Mrkatz\LoginProviders\Controllers\SocialController@redirectToProvider');
+Route::get('login/{provider}/callback', 'Mrkatz\LoginProviders\Controllers\SocialController@handleProviderCallback');
 ```
 Normal Laravel Routes
 ```
